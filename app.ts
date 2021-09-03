@@ -1,4 +1,7 @@
+
 const API = require('./api')
+
+const id: number = Number(process.argv[2])
 
 interface InterfaceLoginData {
     email: string;
@@ -8,7 +11,7 @@ interface InterfaceLoginData {
 // YAPI地址
 const host: string = 'https://doc.jsxygkj.com'
 
-const pid: number = 257
+const pid: number = id || 258
 
 const loginData: InterfaceLoginData = {
     email: '15939054361@163.com',
@@ -26,11 +29,16 @@ const tmp = new API(host, pid, {
     createTemplate: false
 })
 
+
 // 登录
-tmp.login(loginData).then(() => {
-    // 开始转化任务
-    tmp.startTask()
-})
+if (id) {
+    tmp.login(loginData).then(() => {
+        // 开始转化任务
+        tmp.startTask()
+    })
+} else {
+    throw '请传入项目id参数'
+}
 
 
 

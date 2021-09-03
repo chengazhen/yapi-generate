@@ -23,7 +23,8 @@ package.json
 
 ```
 npm install
-npm run start
+npm run start 
+npm run start 4555 // 通过npm 传参将项目di传入 逻辑会自动获取
 ```
 
 ## 需要

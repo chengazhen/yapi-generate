@@ -112,6 +112,9 @@ class YAPI {
     }
 
     parseContent(content: any) {
+        if (fs.existsSync(__dirname + '/api/')) {
+            this.clearFile(__dirname + '/api/')
+        }
         const startTime: number = new Date().getTime()
         for (let i of content) {
             let str: string = this._start(i.name, i.add_time, i.up_time)
