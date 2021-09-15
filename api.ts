@@ -355,7 +355,8 @@ ${spaceString}})
                         str += `<el-table-column prop="${key}" label="${obj[key]['description'] || '默认标题'}"></el-table-column>\n`
                     }
                     str += '</el-table>\n <Pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getSysDictPage" /></div>\n</template>\n'
-                    str += `<script>\nimport Pagination from '@/components/Pagination'\n</script>`
+                    str += `<script>\nimport Pagination from '@/components/Pagination'\n //listQuery:{page:1,size:20}\n</script>`
+
                     this.createVueTemplate(str, sub_item.title)
                 }
             })
