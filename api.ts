@@ -199,11 +199,15 @@ import ${this.requestInstanceName} from '${this.requestImportName}';`
         // 第二步创建方法名
         // const functionName = this._raiseFunctionName(item.path, item.method.toLowerCase())
         const functionName = this._raiseFunctionName(item)
+
         // 格式化请求方式
         const method = item.method.toLowerCase()
         const path = item.path.replace(/{/g, '${')
+
+        const comments = this._createComments(item)
+        // 第三步创建方法内容
         returnValue += `
-    ${this._createComments(item)}
+    ${comments}
 export function ${functionName}
 ${spaceString}return ${this.requestInstanceName}({
 ${spaceString + spaceString}url: \`${path}\`,
@@ -212,7 +216,19 @@ ${spaceString + spaceString}${method === 'get' ? 'params' : 'data'},
 ${spaceString + spaceString}...other
 ${spaceString}})
 }`
-        // 第三步创建方法内容
+        // 生成一个 导入页面 async 方法
+        returnValue += `
+/*async  ${functionName} 
+try {
+const { code, data } = await ${functionName.replace(/\{$/, '')}
+  if (code === 0) {
+     console.log(data);
+  }
+} catch (error) {
+            console.log(error)
+    }
+} */`
+
 
         // 最后闭合方法
         return returnValue
@@ -229,27 +245,6 @@ ${spaceString}})
  * ${item.title}
  * YAPI: ${this.yapiAddress}/interface/api/${item._id}
  * 备注: ${this._filterHtmlTag((item.desc || '').trim()).replace(/\n/g, `\n${this.spaceString}* `)}`
-
-        const obj: any = {
-            req_params: '请求参数 - 路径中的标量',
-            req_body_other: '请求参数 - body - json',
-            req_body_form: '请求参数 - body - formData',
-        }
-
-        for (let i in obj) {
-            let commentItem = item[i]
-            if (commentItem && commentItem.length) {
-                if (i === 'req_params') {
-                    commentItem = commentItem.map(item => ({ name: item.name, desc: item.desc }))
-                }
-                if (typeof commentItem === 'string') {
-                    str += `\n * ${obj[i]}\n` + commentItem
-                } else {
-                    str += `\n * ${obj[i]}\n` + JSON.stringify(commentItem, null, 2)
-                }
-            }
-        }
-
 
         return str + '\n */'
     }
