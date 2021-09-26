@@ -27,7 +27,7 @@ const tmp = new API(host, pid, {
     requestInstanceName: 'request',
     requestImportName: '@/utils/request',
     apiCondition: '查询', // 匹配生成表格的条件
-    createTemplate: false //是否生成vue表格模板
+    createTemplate: true //是否生成vue表格模板
 })
 
 
