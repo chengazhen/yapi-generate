@@ -1,0 +1,12 @@
+<% if (user) { %>
+  <template>
+    <div class="page">
+   <el-table v-loading="tableLoading" :data="tabelData" border stripe>
+
+  {{each user val key}}
+    {{val}} {{key}}
+  {{/each}}
+   </el-table>
+    <Pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getSysDictPage" /></div>
+   </template>
+<% } %>
