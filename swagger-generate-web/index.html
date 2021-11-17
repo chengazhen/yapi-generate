@@ -1,0 +1,274 @@
+<!--
+ * @Description: 
+ * @Author: 
+ * @LastEditors: chengchongzhen
+ * @Date: 2021-11-15 16:45:09
+ * @LastEditTime: 2021-11-16 15:44:30
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        html,
+        body {
+            height: 100%;
+
+        }
+
+        body {
+            overflow-y: auto;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .form-card {
+            position: sticky;
+            top: 0;
+            z-index: 9;
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+
+        .form-card .el-form-item {
+            margin-bottom: 0;
+        }
+
+        .box-card {
+            margin-top: 20px;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app" v-loading="loading">
+        <el-card class="form-card" shadow='never'>
+            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                <el-form-item label="文档接口">
+                    <el-input v-model="formInline.url" placeholder="文档接口,不需要swagger.html路径" @change="urlInput">
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="接口模块">
+                    <el-select v-model="formInline.module" placeholder="接口模块" @change="selectModule">
+                        <el-option :label="item.ame" :value="item.name" v-for='(item,index) in module' :key='index'>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否生成旧版api">
+                    <el-switch v-model="formInline.old">
+                    </el-switch>
+                </el-form-item>
+                <el-form-item label="是否生成新版api">
+                    <el-switch v-model="formInline.new">
+                    </el-switch>
+                </el-form-item>
+                <el-form-item>
+                    <!-- <el-button type="primary" @click="onSubmit">查询</el-button> -->
+                </el-form-item>
+            </el-form>
+        </el-card>
+        <el-card class="box-card" shadow='never'>
+            <el-row :gutter="20">
+                <el-col :span="12">
+                    <el-card>
+                        <div slot="header">
+                            <el-tag>api 接口</el-tag>
+                            <el-button :data-clipboard-text="apiGenerate" type="primary" plain size="mini"
+                                style="float:right" class="copyBtn">复制所有代码
+                            </el-button>
+                        </div>
+                        <pre v-html='apiGenerate'></pre>
+                    </el-card>
+                </el-col>
+                <el-col :span="12">
+                    <el-card>
+                        <div slot="header">
+                            <el-tag>旧版 api 生成</el-tag>
+                            <el-button :data-clipboard-text="oldApiGenerate" type="primary" plain size="mini"
+                                style="float:right" class="copyBtn">复制所有代码
+                            </el-button>
+                        </div>
+                        <pre v-html='oldApiGenerate'></pre>
+                    </el-card>
+                </el-col>
+            </el-row>
+        </el-card>
+    </div>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                basePath: '',
+                visible: false,
+                formInline: {
+                    url: '',
+                    module: '',
+                    old: true,
+                    new: false
+                },
+                module: [],
+                apiData: {},
+                apiGenerate: '',
+                oldApiGenerate: '',
+                loading: false,
+                activeNames: '1'
+            }
+        },
+        created() {
+            this.formInline.url = localStorage.getItem('url')
+            if (this.formInline.url) {
+                this.urlInput(this.formInline.url)
+            }
+        },
+        mounted() {
+            var clipboard = new ClipboardJS('.copyBtn');
+            clipboard.on('success', function (e) {
+                ELEMENT.Message({
+                    message: '复制成功',
+                    type: 'success'
+                });
+                e.clearSelection();
+            });
+            clipboard.on('error', function (e) {
+                console.error('Action:', e.action);
+                console.error('Trigger:', e.trigger);
+                ELEMENT.Message.error('复制失败')
+            });
+        },
+        methods: {
+            /**
+             * @description: 用户输入的url
+             * @param {*} value
+             * @return {*}
+             */
+            urlInput(value) {
+                if (/http/.test(value)) {
+                    localStorage.setItem('url', value)
+                    this.loading = true
+                    axios.get(value + '/v2/api-docs').then(({ data }) => {
+                        this.loading = false
+                        const { tags, basePath } = data
+                        this.basePath = basePath
+                        this.module = tags
+                        this.apiData = data.paths
+                    }).catch(error => {
+                        this.loading = false
+                        console.log(error);
+                    })
+                }
+            },
+
+            /**
+             * @description: 选择需要生成代码的模块
+             * @param {*}
+             * @return {*}
+             */
+            selectModule() {
+                this.apiGenerate = ''
+                this.oldApiGenerate = ''
+                for (const key in this.apiData) {
+                    const target = this.apiData[key]
+                    let method = 'get'
+                    let tag;
+                    if (target['get']) {
+                        tag = target['get'].tags
+                        method = 'get'
+                    } else {
+                        tag = target['post'].tags
+                        method = 'post'
+                    }
+                    if (tag.includes(this.formInline.module)) {
+                        let parameters
+                        parameters = target[method].parameters
+                        summary = target[method].summary
+                        const annotation = this.generateAnnotation(parameters, summary)
+                        if (this.formInline.new) {
+                            this.apiGenerate += this.generateFuction(target, key, method, annotation)
+                        }
+                        if (this.formInline.old) {
+                            this.oldApiGenerate += this.generateOldFunction(key, method, summary)
+                        }
+                    }
+                }
+            },
+            /**
+             * @description: 生成函数注释
+             * @param {*} parameters
+             * @return {*}
+             */
+            generateAnnotation(parameters = [], summary) {
+                let paramStr = ``
+                parameters.forEach(item => {
+                    paramStr += `* @param {*} ${item.name}
+                `})
+                return `
+                /**
+                * @description: ${summary}
+                ${paramStr}* @return {*}
+                */ `
+            },
+
+            /**
+             * @description: 生成函数
+             * @param {*} target
+             * @param {*} key
+             * @param {*} method
+             * @param {*} annotation
+             * @return {*}
+             */
+            generateFuction(target, key, method, annotation) {
+                let paramsType = 'data'
+                if (method === 'get') {
+                    paramsType = 'params'
+                }
+                const paths = key.split('/')
+                const methodPart = paths.at(-1)
+                const funcStr = `
+                ${annotation}
+                export function ${method}${methodPart.replace(/^\S/, s => s.toUpperCase())}(${paramsType}, other = {}) {
+                    return request({
+                    url: "${this.basePath}${key}",
+                    method: '${method}',
+                    ${paramsType},
+                    ...other
+                  })
+                }`
+                return funcStr
+            },
+
+            /**
+             * @description: 生成旧版 api
+             * @param {*}
+             * @return {*}
+             */
+            generateOldFunction(key, method, summary) {
+                const paths = key.split('/')
+                const methodPart = paths.at(-1)
+                return `
+                ${methodPart.replace(/^\S/, s => s.toLowerCase())}:"${this.basePath}${key}|${method.toUpperCase()}", // ${summary}`
+            }
+        },
+    })
+</script>
+
+</html>
