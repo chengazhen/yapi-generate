@@ -3,374 +3,450 @@
  * @Author: 
  * @LastEditors: chengchongzhen
  * @Date: 2021-11-15 16:45:09
- * @LastEditTime: 2021-12-14 10:34:17
+ * @LastEditTime: 2022-02-25 10:13:49
 -->
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <style>
-        html,
-        body {
-            height: 100%;
+      html,
+      body {
+        height: 100%;
+      }
 
-        }
+      body {
+        overflow-y: auto;
+      }
 
-        body {
-            overflow-y: auto;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-        }
+      .form-card {
+        position: sticky;
+        top: 0;
+        z-index: 9;
+      }
 
-        .form-card {
-            position: sticky;
-            top: 0;
-            z-index: 9;
-        }
+      .clearfix:before,
+      .clearfix:after {
+        display: table;
+        content: '';
+      }
 
-        .clearfix:before,
-        .clearfix:after {
-            display: table;
-            content: "";
-        }
+      .clearfix:after {
+        clear: both;
+      }
 
-        .clearfix:after {
-            clear: both
-        }
+      .form-card .el-form-item {
+        margin-bottom: 0;
+      }
 
-        .form-card .el-form-item {
-            margin-bottom: 0;
-        }
-
-        .box-card {
-            margin-top: 20px;
-        }
+      .box-card {
+        margin-top: 20px;
+      }
     </style>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <!-- import CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-</head>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+    />
+  </head>
 
-<body>
+  <body>
+    <a href="https://github.com/azhen98/generate-swagger-web">
+      <img
+        style="
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100px;
+          height: 100px;
+          border: 0;
+          z-index: 999;
+        "
+        src="https://nihaojob.github.io/markdown-css-smartisan/examples/fork-me-right-graphite@2x.png"
+        alt="Fork me on GitHub"
+      />
+    </a>
     <div id="app" v-loading="loading">
-        <el-card class="form-card" shadow='never'>
-            <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                <el-form-item label="文档接口">
-                    <el-input v-model="formInline.url" placeholder="文档接口,不需要swagger.html路径" @change="urlInput">
-                    </el-input>
-                </el-form-item>
-                <el-form-item label="接口模块">
-                    <el-select v-model="formInline.module" placeholder="接口模块" @change="selectModule">
-                        <el-option :label="item.ame" :value="item.name" v-for='(item,index) in module' :key='index'>
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="是否生成旧版api">
-                    <el-switch v-model="formInline.old">
-                    </el-switch>
-                </el-form-item>
-                <el-form-item label="是否生成vue内部函数">
-                    <el-switch v-model="formInline.vueFunc">
-                    </el-switch>
-                </el-form-item>
-                <el-form-item label="是否生成新版api">
-                    <el-switch v-model="formInline.new">
-                    </el-switch>
-                </el-form-item>
-                <el-form-item>
-                    <el-link type="primary" target="_blank" href="https://www.cnblogs.com/shiazhen/p/12021048.html">
-                        axios 封装(简单版)</el-link>
-                </el-form-item>
-            </el-form>
-        </el-card>
-        <el-card class="box-card" shadow='never'>
-            <el-row :gutter="20">
-                <el-col :span="12">
-                    <el-card>
-                        <div slot="header">
-                            <el-tag>api 接口</el-tag>
-                            <el-button :data-clipboard-text="apiGenerate" type="primary" plain size="mini"
-                                style="float:right" class="copyBtn">复制所有代码
-                            </el-button>
-                        </div>
-                        <pre v-html='apiGenerate'></pre>
-                    </el-card>
-                </el-col>
-                <el-col :span="12">
-                    <el-card>
-                        <div slot="header">
-                            <el-tag>vue 内部函数</el-tag>
-                            <el-button :data-clipboard-text="vueFuncGenerate" type="primary" plain size="mini"
-                                style="float:right" class="copyBtn">复制所有代码
-                            </el-button>
-                        </div>
-                        <pre v-html='vueFuncGenerate'></pre>
-                    </el-card>
-
-                </el-col>
-            </el-row>
-        </el-card>
-        <el-card class="box-card" shadow='never'>
-            <el-row :gutter="20">
-                <el-col :span="12">
-                    <el-card>
-                        <div slot="header">
-                            <el-tag>旧版 api 生成</el-tag>
-                            <el-button :data-clipboard-text="oldApiGenerate" type="primary" plain size="mini"
-                                style="float:right" class="copyBtn">复制所有代码
-                            </el-button>
-                        </div>
-                        <pre v-html='oldApiGenerate'></pre>
-                    </el-card>
-                </el-col>
-                <el-col :span="12">
-                    <el-card>
-                        <div slot="header">
-                            <el-tag>待开发</el-tag>
-                            <el-button :data-clipboard-text="tableGenerateData" type="primary" plain size="mini"
-                                style="float:right" class="copyBtn">复制所有代码
-                            </el-button>
-                        </div>
-                        <pre v-text='tableGenerateData'></pre>
-                    </el-card>
-                </el-col>
-            </el-row>
-        </el-card>
+      <el-card class="form-card" shadow="never">
+        <el-form :inline="true" :model="formInline" class="demo-form-inline">
+          <el-form-item label="文档接口">
+            <el-input
+              v-model="formInline.url"
+              placeholder="文档接口,不需要swagger.html路径"
+              @change="urlInput"
+            >
+            </el-input>
+          </el-form-item>
+          <el-form-item label="接口模块">
+            <el-select
+              v-model="formInline.module"
+              placeholder="接口模块"
+              @change="selectModule"
+            >
+              <el-option
+                :label="item.ame"
+                :value="item.name"
+                v-for="(item,index) in module"
+                :key="index"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="是否生成旧版api:">
+            <el-switch v-model="formInline.old"> </el-switch>
+          </el-form-item>
+          <el-form-item label="是否生成vue内部函数:">
+            <el-switch v-model="formInline.vueFunc"> </el-switch>
+          </el-form-item>
+          <el-form-item label="是否生成新版api:">
+            <el-switch v-model="formInline.new"> </el-switch>
+          </el-form-item>
+          <el-form-item>
+            <el-link
+              type="primary"
+              target="_blank"
+              href="https://www.cnblogs.com/shiazhen/p/12021048.html"
+            >
+              axios 封装(简单版)</el-link
+            >
+          </el-form-item>
+          <el-form-item label="">
+            <mark>提示:兼容swagger, apifox</mark>
+          </el-form-item>
+        </el-form>
+      </el-card>
+      <el-card class="box-card" shadow="never">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>api 接口</el-tag>
+                <el-button
+                  :data-clipboard-text="apiGenerate"
+                  type="primary"
+                  plain
+                  size="mini"
+                  style="float: right"
+                  class="copyBtn"
+                  >复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="apiGenerate"></pre>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>vue 内部函数</el-tag>
+                <el-button
+                  :data-clipboard-text="vueFuncGenerate"
+                  type="primary"
+                  plain
+                  size="mini"
+                  style="float: right"
+                  class="copyBtn"
+                  >复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="vueFuncGenerate"></pre>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-card>
+      <el-card class="box-card" shadow="never">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>旧版 api 生成</el-tag>
+                <el-button
+                  :data-clipboard-text="oldApiGenerate"
+                  type="primary"
+                  plain
+                  size="mini"
+                  style="float: right"
+                  class="copyBtn"
+                  >复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="oldApiGenerate"></pre>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>待开发</el-tag>
+                <el-button
+                  :data-clipboard-text="tableGenerateData"
+                  type="primary"
+                  plain
+                  size="mini"
+                  style="float: right"
+                  class="copyBtn"
+                  >复制所有代码
+                </el-button>
+              </div>
+              <pre v-text="tableGenerateData"></pre>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-card>
     </div>
-
-</body>
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
-<script>
+  </body>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+  <script>
     new Vue({
-        el: '#app',
-        data: function () {
-            return {
-                basePath: '',
-                visible: false,
-                formInline: {
-                    url: '',
-                    module: '',
-                    old: false,
-                    new: true,
-                    vueFunc: true
-                },
-                module: [],
-                apiData: {},
-                apiGenerate: '',
-                oldApiGenerate: '',
-                vueFuncGenerate: '',
-                loading: false,
-                activeNames: '1',
-                tableDataRow: [],
-                tableGenerateData: ''
+      el: '#app',
+      data: function () {
+        return {
+          basePath: '',
+          visible: false,
+          formInline: {
+            url: '',
+            module: '',
+            old: false,
+            new: true,
+            vueFunc: true
+          },
+          module: [],
+          apiData: {},
+          apiGenerate: '',
+          oldApiGenerate: '',
+          vueFuncGenerate: '',
+          loading: false,
+          activeNames: '1',
+          tableDataRow: [],
+          tableGenerateData: ''
+        }
+      },
+      created() {
+        const form = JSON.parse(localStorage.getItem('form'))
+        if (form) {
+          this.formInline = form
+          this.urlInput(this.formInline.url)
+        }
+      },
+      mounted() {
+        var clipboard = new ClipboardJS('.copyBtn')
+        clipboard.on('success', function (e) {
+          ELEMENT.Message({
+            message: '复制成功',
+            type: 'success'
+          })
+          e.clearSelection()
+        })
+        clipboard.on('error', function (e) {
+          console.error('Action:', e.action)
+          console.error('Trigger:', e.trigger)
+          ELEMENT.Message.error('复制失败')
+        })
+      },
+      methods: {
+        /**
+         * @description: 用户输入的url
+         * @param {*} value
+         * @return {*}
+         */
+        urlInput(value) {
+          if (/http/.test(value)) {
+            if (!/openapi/.test(value)) {
+              value = value + '/v2/api-docs'
             }
+            this.loading = true
+            axios
+              .get(value)
+              .then(({ data }) => {
+                this.loading = false
+                const { tags, basePath, definitions } = data
+                this.basePath = basePath || ''
+                this.module = tags
+                this.apiData = data.paths
+
+                // 收集生成表格的原生数据
+                var reg = /^[\u4e00-\u9fa5]\S*[\u4e00-\u9fa5]$/
+                for (const key in definitions) {
+                  if (reg.test(key)) {
+                    this.tableDataRow.push(definitions[key])
+                  }
+                }
+                console.log('definitions===>', this.tableDataRow)
+              })
+              .catch(error => {
+                this.loading = false
+                console.log(error)
+              })
+          }
         },
-        created() {
-            const form = JSON.parse(localStorage.getItem('form'))
-            if (form) {
-                this.formInline = form
-                this.urlInput(this.formInline.url)
+
+        /**
+         * @description: 选择需要生成代码的模块
+         * @param {*}
+         * @return {*}
+         */
+        selectModule() {
+          localStorage.setItem('form', JSON.stringify(this.formInline))
+
+          this.apiGenerate = ''
+          this.oldApiGenerate = ''
+          this.vueFuncGenerate = ''
+          this.tableGenerateData = ''
+          for (const key in this.apiData) {
+            const target = this.apiData[key]
+            let method = 'get'
+            let tag
+            if (target['get']) {
+              tag = target['get'].tags
+              method = 'get'
+            } else {
+              tag = target['post'].tags
+              method = 'post'
             }
-        },
-        mounted() {
-            var clipboard = new ClipboardJS('.copyBtn');
-            clipboard.on('success', function (e) {
-                ELEMENT.Message({
-                    message: '复制成功',
-                    type: 'success'
-                });
-                e.clearSelection();
-            });
-            clipboard.on('error', function (e) {
-                console.error('Action:', e.action);
-                console.error('Trigger:', e.trigger);
-                ELEMENT.Message.error('复制失败')
-            });
-        },
-        methods: {
-            /**
-             * @description: 用户输入的url
-             * @param {*} value
-             * @return {*}
-             */
-            urlInput(value) {
-                if (/http/.test(value)) {
-                    this.loading = true
-                    axios.get(value + '/v2/api-docs').then(({ data }) => {
-                        this.loading = false
-                        const { tags, basePath, definitions } = data
-                        this.basePath = basePath
-                        this.module = tags
-                        this.apiData = data.paths
+            if (tag.includes(this.formInline.module)) {
+              let parameters
+              parameters = target[method].parameters
+              const tableRow = target[method]['responses'][200]['schema']?.$ref
+              console.log('tableRow===>', tableRow)
 
-                        // 收集生成表格的原生数据
-                        var reg = /^[\u4e00-\u9fa5]\S*[\u4e00-\u9fa5]$/
-                        for (const key in definitions) {
-                            if (reg.test(key)) {
-                                this.tableDataRow.push(definitions[key])
-                            }
-                        }
-                        console.log('definitions===>', this.tableDataRow);
-
-
-
-                    }).catch(error => {
-                        this.loading = false
-                        console.log(error);
-                    })
+              this.tableDataRow.find(item => {
+                const reg = new RegExp(`${item.title}`, 'g')
+                if (reg.test(tableRow)) {
+                  this.tableGenerateData += this.generateTable(item)
                 }
-            },
-
-            /**
-             * @description: 选择需要生成代码的模块
-             * @param {*}
-             * @return {*}
-             */
-            selectModule() {
-                localStorage.setItem('form', JSON.stringify(this.formInline))
-
-                this.apiGenerate = ''
-                this.oldApiGenerate = ''
-                this.vueFuncGenerate = ''
-                this.tableGenerateData = ''
-                for (const key in this.apiData) {
-                    const target = this.apiData[key]
-                    let method = 'get'
-                    let tag;
-                    if (target['get']) {
-                        tag = target['get'].tags
-                        method = 'get'
-                    } else {
-                        tag = target['post'].tags
-                        method = 'post'
-                    }
-                    if (tag.includes(this.formInline.module)) {
-                        let parameters
-                        parameters = target[method].parameters
-                        const tableRow = target[method]['responses'][200]['schema']?.$ref
-                        console.log('tableRow===>', tableRow);
-
-                        this.tableDataRow.find(item => {
-                            const reg = new RegExp(`${item.title}`, 'g')
-                            if (reg.test(tableRow)) {
-                                this.tableGenerateData += this.generateTable(item)
-                            }
-                        })
-                        summary = target[method].summary
-                        const annotation = this.generateAnnotation(parameters, summary)
-                        if (this.formInline.new) {
-                            this.apiGenerate += this.generateFuction(target, key, method, annotation)
-                        }
-                        if (this.formInline.old) {
-                            this.oldApiGenerate += this.generateOldFunction(key, method, summary)
-                        }
-                        if (this.formInline.vueFunc) {
-                            this.vueFuncGenerate += this.generateVueFunc(key, method, annotation)
-                        }
-                    }
-                }
-            },
-            /**
-             * @description: 生成函数注释
-             * @param {*} parameters
-             * @return {*}
-             */
-            generateAnnotation(parameters = [], summary) {
-                let paramStr = ``
-                parameters.forEach(item => {
-                    if (!/item.name/g.test(paramStr)) {
-                        paramStr += `* @param {*} ${item.name}
+              })
+              summary = target[method].summary
+              const annotation = this.generateAnnotation(parameters, summary)
+              if (this.formInline.new) {
+                this.apiGenerate += this.generateFuction(
+                  target,
+                  key,
+                  method,
+                  annotation
+                )
+              }
+              if (this.formInline.old) {
+                this.oldApiGenerate += this.generateOldFunction(
+                  key,
+                  method,
+                  summary
+                )
+              }
+              if (this.formInline.vueFunc) {
+                this.vueFuncGenerate += this.generateVueFunc(
+                  key,
+                  method,
+                  annotation
+                )
+              }
+            }
+          }
+        },
+        /**
+         * @description: 生成函数注释
+         * @param {*} parameters
+         * @return {*}
+         */
+        generateAnnotation(parameters = [], summary) {
+          let paramStr = ``
+          parameters.forEach(item => {
+            if (!/item.name/g.test(paramStr)) {
+              paramStr += `* @param {*} ${item.name}
                 `
-                    }
-                })
-                return `
+            }
+          })
+          return `
                 /**
                 * @description: ${summary}
                 ${paramStr}* @return {*}
                 */ `
-            },
+        },
 
-            /**
-             * @description: 生成函数
-             * @param {*} target
-             * @param {*} key
-             * @param {*} method
-             * @param {*} annotation
-             * @return {*}
-             */
-            generateFuction(target, key, method, annotation) {
-                let paramsType = 'data'
+        /**
+         * @description: 生成函数
+         * @param {*} target
+         * @param {*} key
+         * @param {*} method
+         * @param {*} annotation
+         * @return {*}
+         */
+        generateFuction(target, key, method, annotation) {
+          let paramsType = 'data'
 
-                if (method === 'get') {
-                    paramsType = 'params'
-                }
-                const paths = key.split('/')
-                const isUrlParams = /{\S+}/.test(paths)
-                let url = `${this.basePath}${key}`
-                let methodPart = paths.at(-1)
-                const urlParams = paths.at(-1).replace(/\{|\}/g, '')
-                if (isUrlParams) {
-                    methodPart = paths.at(-2)
-                    key = key.replace(/\{\S+\}/g, "")
-                    url = `"${this.basePath}${key}"` + '+' + urlParams
-                }
-                const funcStr = `
+          if (method === 'get') {
+            paramsType = 'params'
+          }
+          const paths = key.split('/')
+          const isUrlParams = /{\S+}/.test(paths)
+          let url = `${this.basePath}${key}`
+          let methodPart = paths.at(-1)
+          const urlParams = paths.at(-1).replace(/\{|\}/g, '')
+          if (isUrlParams) {
+            methodPart = paths.at(-2)
+            key = key.replace(/\{\S+\}/g, '')
+            url = `"${this.basePath}${key}"` + '+' + urlParams
+          }
+          const funcStr = `
                 ${annotation}
-                export function ${method}${methodPart.replace(/^\S/, s => s.toUpperCase())}(${isUrlParams ? urlParams + ',' : ""} ${paramsType}, other = {}) {
+                export function ${method}${methodPart.replace(/^\S/, s =>
+            s.toUpperCase()
+          )}(${isUrlParams ? urlParams + ',' : ''} ${paramsType}, other = {}) {
                     return request({
-                    url:${url},
+                    url:'${url}',
                     method: '${method}',
                     ${paramsType},
                     ...other
                   })
                 }`
-                return funcStr
-            },
+          return funcStr
+        },
 
-            /**
-             * @description: 生成旧版 api
-             * @param {*}
-             * @return {*}
-             */
-            generateOldFunction(key, method, summary) {
-                const paths = key.split('/')
-                const methodPart = paths.at(-1)
-                return `
+        /**
+         * @description: 生成旧版 api
+         * @param {*}
+         * @return {*}
+         */
+        generateOldFunction(key, method, summary) {
+          const paths = key.split('/')
+          const methodPart = paths.at(-1)
+          return `
                 export const   downLoad${methodPart}=host+"${this.basePath}${key}" // ${summary}`
-            },
-            async getAppReservationPage() {
-                try {
-                    this.tableLoading = true
-                    const { code, data } = await getAppReservationPage(this.listQuery)
-                    if (code === 0) {
-                        this.total = data.total
-                        this.tabelData = data.records
-                    }
-                } catch (error) {
-                    console.log(error)
-                } finally {
-                    this.tableLoading = false
-                }
-            },
+        },
+        async getAppReservationPage() {
+          try {
+            this.tableLoading = true
+            const { code, data } = await getAppReservationPage(this.listQuery)
+            if (code === 0) {
+              this.total = data.total
+              this.tabelData = data.records
+            }
+          } catch (error) {
+            console.log(error)
+          } finally {
+            this.tableLoading = false
+          }
+        },
 
-            /**
-             * @description: 生成 vue 内部调用函数
-             * @param {*} key
-             * @param {*} method
-             * @param {*} annotation
-             * @return {*}
-             */
-            generateVueFunc(key, method, annotation) {
-                const paths = key.split('/')
-                const methodPart = paths.at(-1)
-                const funcName = ` ${method}${methodPart.replace(/^\S/, s => s.toUpperCase())}`
-                const funcStr = `
+        /**
+         * @description: 生成 vue 内部调用函数
+         * @param {*} key
+         * @param {*} method
+         * @param {*} annotation
+         * @return {*}
+         */
+        generateVueFunc(key, method, annotation) {
+          const paths = key.split('/')
+          const methodPart = paths.at(-1)
+          const funcName = ` ${method}${methodPart.replace(/^\S/, s =>
+            s.toUpperCase()
+          )}`
+          const funcStr = `
             ${annotation}
             async ${funcName}() {
                 try {
@@ -384,31 +460,30 @@
                     console.log(error)
                 }
             },`
-                return funcStr
-            },
+          return funcStr
+        },
 
-            generateTable(row) {
-                const properties = row.properties
-                let keyArr = `
+        generateTable(row) {
+          const properties = row.properties
+          let keyArr = `
                     [`
-                let titleArr = `
+          let titleArr = `
                     [`
-                // const propertiesLength = Object.keys(row.properties).length-1
-                // let index = 0
-                function generateAccuracyStr(key, title) {
-                    if (/[准确率|正确率]/g.test(title)) {
-                        return (`
+          // const propertiesLength = Object.keys(row.properties).length-1
+          // let index = 0
+          function generateAccuracyStr(key, title) {
+            if (/[准确率|正确率]/g.test(title)) {
+              return `
                 <template slot-scope="{row}">
                   <div>
                     {{((row['${key}']||0)*100).toFixed(2)}}%
                   </div>
                 </template>
-                `)
-                    }
-                    return ``
-
-                }
-                let str = `
+                `
+            }
+            return ``
+          }
+          let str = `
                 // ${row.title}
                 <el-table :data="tableData"
                 style="width: 100%"
@@ -416,12 +491,12 @@
                 v-loading="tableLoading"
                 :header-row-style="aheaderRowStyle"
                 :row-class-name="tableRowClassName">`
-                for (const [key, value] of Object.entries(properties)) {
-                    keyArr += `"${key}",
+          for (const [key, value] of Object.entries(properties)) {
+            keyArr += `"${key}",
                     `
-                    titleArr += `"${value.description}",
+            titleArr += `"${value.description}",
                     `
-                    str += `
+            str += `
                     <el-table-column prop="${key}"
                          label="${value.description}"
                          sortable=''
@@ -429,17 +504,15 @@
                          align='center'>
                     ${generateAccuracyStr(key, value.description)}
                     </el-table-column> `
-                }
-                str += `
+          }
+          str += `
                 </el-table>
                 ${keyArr}]
                 ${titleArr}]
                 `
-                return str
-            }
-
-        },
+          return str
+        }
+      }
     })
-</script>
-
+  </script>
 </html>
