@@ -2,6 +2,9 @@
 .DS_Store
 Thumbs.db
 
+/public/file/apifox/api/*.vue
+
+
 # 忽略编译生成的文件
 /dist
 /build
@@ -25,7 +28,6 @@ Thumbs.db
 /.vscode
 /.idea
 /.vs
-/public/file/apifox/*
 *.sublime-project
 *.sublime-workspace
 
