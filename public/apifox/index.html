@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>apifox</title>
+  <link rel="stylesheet" href="../stylesheets/index.css">
+  <link href="https://cdn.jsdelivr.net/npm/element-plus@2.2.0/dist/index.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="app" style="padding: 16px;">
+    <!-- elementui 表单 -->
+    <el-form label-width="100px" :rules="formRules" :model="formData" ref="formRef" >
+      <el-form-item  label="项目地址" prop="host">
+        <el-input v-model="formData.host"></el-input>
+      </el-form-item>
+      <el-form-item label="项目id" prop="pid">
+        <el-input v-model="formData.pid"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="formData.email"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input type="password" v-model="formData.password"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm">Submit</el-button>
+      </el-form-item>
+    </el-form>
+
+    <div v-for="item in tableData"> <a :href="item" :download="item"> {{ item }} </a></div>
+  </div>
+
+  <script src="../javascripts/vue.global.js"></script>
+  <script src="../javascripts/index.full.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+  <script src="./js/app.js?id=1"></script>
+</body>
+
+</html>

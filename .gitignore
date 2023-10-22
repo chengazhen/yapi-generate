@@ -25,6 +25,7 @@ Thumbs.db
 /.vscode
 /.idea
 /.vs
+/public/file/apifox/*
 *.sublime-project
 *.sublime-workspace
 

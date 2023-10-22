@@ -4,37 +4,34 @@ var API = require('../lib/apifox/index.js')
 var path = require('path');
 const fs = require('fs');
 const dirPath = path.join(process.cwd(), 'public/file/apifox');
-const baseUrl = `./public/file/apifox`; // 替换为实际的基本URL
+const baseUrl = `/public/file/apifox`; // 替换为实际的基本URL
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
+router.post('/', async function (req, res, next) {
+  const { pid, email, password, host } = req.body
   try {
     const loginData = {
-      email: '15939054361@163.com',
-      password: 'z19980522',
+      email,
+      password
     };
-    const host = 'https://doc.jsxygkj.com';
-    const pid = req.query.id || 258;
+
     const tmp = new API(host, pid, {
       pathFolder: dirPath,
       space: 2,
       requestInstanceName: 'request',
       requestImportName: '@/utils/request',
       apiCondition: '查询',
-      createTemplate: true,
+      createTemplate: false,
     });
 
     if (pid) {
-      tmp.login(loginData).then(() => {
-        tmp.startTask();
-      });
+      await tmp.login(loginData)
+      await tmp.startTask();
     } else {
       throw '请传入项目id参数';
     }
 
     // 指定要读取的目录路径和基本URL
-
-  
 
     // 生成public文件夹里的文件目录
     res.send({

@@ -1,0 +1,39 @@
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  overflow-y: auto;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.form-card {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: '';
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.form-card .el-form-item {
+  margin-bottom: 0;
+}
+
+.box-card {
+  margin-top: 20px;
+}
