@@ -1,0 +1,49 @@
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# 忽略编译生成的文件
+/dist
+/build
+/out
+/.next
+/.nuxt
+/static
+/.idea
+
+# 忽略依赖管理工具生成的文件夹
+/node_modules
+/bower_components
+
+# 忽略日志文件
+*.log
+
+# 忽略临时文件
+*.tmp
+
+# 忽略IDE和编辑器生成的文件
+/.vscode
+/.idea
+/.vs
+*.sublime-project
+*.sublime-workspace
+
+# 忽略配置文件
+*.config.js
+.env
+
+# 忽略特定的个人配置文件
+personal-config.js
+
+# 忽略备份文件
+*.bak
+*.swp
+*~
+
+# 忽略自动生成的文档
+/docs
+
+# 忽略特定的构建工具生成的文件
+webpack.config.js
+gulpfile.js
+Gruntfile.js
