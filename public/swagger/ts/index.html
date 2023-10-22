@@ -1,0 +1,176 @@
+<!--
+ * @Description: 
+ * @Author: 
+ * @LastEditors: chengchongzhen
+ * @Date: 2021-11-15 16:45:09
+ * @LastEditTime: 2023-07-16 17:35:03
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    html,
+    body,
+    #app {
+      height: 100%;
+    }
+
+    body {
+      overflow-y: auto;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .form-card {
+      position: sticky;
+      top: 0;
+      z-index: 9;
+    }
+
+    .clearfix:before,
+    .clearfix:after {
+      display: table;
+      content: '';
+    }
+
+    .clearfix:after {
+      clear: both;
+    }
+
+    .form-card .el-form-item {
+      margin-bottom: 0;
+    }
+
+    .box-card {
+      margin-top: 20px;
+    }
+  </style>
+  <meta charset="UTF-8" />
+  <!-- import CSS -->
+  <!-- <link
+      rel="stylesheet"
+      href="https://unpkg.com/ElementPlus-ui/lib/theme-chalk/index.css"
+    /> -->
+  <link href="https://cdn.jsdelivr.net/npm/element-plus@2.2.0/dist/index.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- <a href="https://github.com/azhen98/generate-swagger-web">
+    <img style="
+          position: fixed;
+          top: 0;
+          right: 0;
+          width: 80px;
+          height: 80px;
+          border: 0;
+          z-index: 999;
+        " src="https://nihaojob.github.io/markdown-css-smartisan/examples/fork-me-right-graphite@2x.png"
+      alt="Fork me on GitHub" />
+  </a> -->
+  <div id="app">
+
+    <div v-loading="loading" element-loading-background="rgba(122, 122, 122, 0.8)" element-loading-text="Loading..."
+      style="height: 100%;">
+      <div style="position: fixed;right: 0; top: 0; z-index: 100;">
+        <mark style="margin-left: 20px;">兼容swagger, apifox</mark>
+      </div>
+
+      <el-card class="form-card" shadow="never">
+        <el-form :inline="true" :model="formInline" class="demo-form-inline">
+          <el-form-item label="文档接口">
+            <el-input v-model="formInline.url" placeholder="文档接口,不需要swagger.html路径" @change="urlInput">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="接口模块">
+            <el-select v-model="formInline.module" placeholder="接口模块" @change="selectModule">
+              <el-option :label="item.ame" :value="item.name" v-for="(item,index) in module" :key="index">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- <el-form-item label="是否生成公司内部api:">
+            <el-switch v-model="formInline.old"> </el-switch>
+          </el-form-item>
+          <el-form-item label="是否生成vue内部函数:">
+            <el-switch v-model="formInline.vueFunc"> </el-switch>
+          </el-form-item> -->
+
+          <el-form-item label="baseHost">
+            <el-input v-model="formInline.oldHost" placeholder="Please input" />
+          </el-form-item>
+  
+          <el-form-item>
+            <el-link target="_blank" href="https://github.com/azhen98/generate-swagger-web" type="primary">
+              github仓库
+            </el-link>
+          </el-form-item>
+
+
+        </el-form>
+
+      </el-card>
+      <el-card class="box-card" shadow="never">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>api 接口</el-tag>
+                <el-button :data-clipboard-text="apiGenerate" type="primary" plain size="small" style="float: right"
+                  class="copyBtn">复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="apiGenerate"></pre>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>interface接口类型</el-tag>
+                <el-button :data-clipboard-text="Array.from(this.interfaceMap.values()).join('')" type="primary" plain size="small" style="float: right"
+                  class="copyBtn">复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="Array.from(this.interfaceMap.values()).join('')"></pre>
+            </el-card>
+          </el-col>
+         
+        </el-row>
+      </el-card>
+      <el-card class="box-card" shadow="never">
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>vue 内部函数</el-tag>
+                <el-button :data-clipboard-text="vueFuncGenerate" type="primary" plain size="small" style="float: right"
+                  class="copyBtn">复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="vueFuncGenerate"></pre>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-card>
+     
+    </div>
+
+
+  </div>
+</body>
+<script src="https://unpkg.com/vue@3"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.min.js"></script> -->
+<!-- <script src="https://unpkg.com/ElementPlus-ui/lib/index.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/element-plus@2.2.0/dist/index.full.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+<script src="./swagger.js"></script>
+<script src="./index.js">
+
+</script>
+
+</html>
