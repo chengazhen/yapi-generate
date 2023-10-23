@@ -202,12 +202,13 @@ const app = Vue.createApp({
 
     startApifox({ requestBody, key, method }) {
       const interfaceName = this.getInterfaceName(key, method)
-      if (requestBody) {
-        const schema = requestBody.content['application/json']?.schema.$ref.split('/').at(-1);
-        if (!this.interfaceMap.has(interfaceName) && schema) {
-          interface = this.generateInterface(interfaceName, schema)
-          this.interfaceMap.set(interfaceName, interface)
+      const schema = requestBody.content['application/json']?.schema
+      if (!this.interfaceMap.has(interfaceName) && schema) {
+        if (!schema.required) {
+          schema.required = []
         }
+        interface = this.generateInterface(interfaceName, schema)
+        this.interfaceMap.set(interfaceName, interface)
       }
     },
 
@@ -303,7 +304,6 @@ const app = Vue.createApp({
 
 
     generateInterface(methodName, schema) {
-      console.log(methodName, schema);
       let paramStr = `
       interface ${methodName} {`
       for (const [key, value] of Object.entries(schema.properties)) {
