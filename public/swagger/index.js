@@ -61,7 +61,7 @@ const app = Vue.createApp({
      */
     urlInput(value) {
       if (/http/.test(value)) {
-        this.platform = getPlatform()
+        this.platform = getPlatform(value)
         this.$notify({
           type: "success",
           title: '提示',
@@ -113,6 +113,7 @@ const app = Vue.createApp({
          * @returns { String }
          */
         function getPlatform(value) {
+          console.log(/openapi/.test(value), value);
           return /openapi/.test(value) ? 'Apifox' : 'swagger'
         }
       }

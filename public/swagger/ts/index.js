@@ -77,7 +77,7 @@ const app = Vue.createApp({
      */
     urlInput(value) {
       if (/http/.test(value)) {
-        this.platform = getPlatform()
+        this.platform = getPlatform(value)
         this.$notify({
           type: "success",
           title: '提示',
