@@ -22,7 +22,7 @@ class Swagger {
     )}${methodPart.replace(/^\S/, s =>
       s.toUpperCase()
     )}`
-    
+
     return name + 'Req'
   }
 
@@ -30,6 +30,13 @@ class Swagger {
     const reqKey = this.parameters[0].schema?.$ref.split('/').at(-1);
     if (reqKey) {
       return this.schema = this.definitions[reqKey];
+    }
+  }
+
+  getSchema2(requestBody) {
+    const reqKey = requestBody.content['application/json']?.schema.$ref.split('/').at(-1);
+    if (reqKey) {
+      return this.schema = this.definitions.schemas[reqKey];
     }
   }
 
