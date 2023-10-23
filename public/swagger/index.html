@@ -95,12 +95,10 @@
           </el-form-item>
 
           <el-form-item>
-            <el-link target="_blank" href="https://github.com/Journey98/generate-api-code" type="primary">
+            <el-link target="_blank" href="https://github.com/Journey98/yapi-generate" type="primary">
               github仓库
             </el-link>
           </el-form-item>
-
-
         </el-form>
 
       </el-card>
@@ -142,17 +140,10 @@
               </div>
               <pre v-html="oldApiGenerate"></pre>
             </el-card>
+
           </el-col>
           <el-col :span="12">
-            <el-card>
-              <div slot="header">
-                <el-tag>table表格</el-tag>
-                <el-button :data-clipboard-text="tableGenerateData" type="primary" plain size="small"
-                  style="float: right" class="copyBtn">复制所有代码
-                </el-button>
-              </div>
-              <pre v-text="tableGenerateData"></pre>
-            </el-card>
+
           </el-col>
         </el-row>
       </el-card>

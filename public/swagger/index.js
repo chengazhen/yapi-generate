@@ -50,9 +50,9 @@ const app = Vue.createApp({
       this.urlInput(this.formInline.url)
     }
   },
-  beforeMount () {
+  beforeMount() {
     console.log(23424);
-  }, 
+  },
   methods: {
     /**
      * @description: 用户输入的url
@@ -61,13 +61,7 @@ const app = Vue.createApp({
      */
     urlInput(value) {
       if (/http/.test(value)) {
-        if (!/openapi/.test(value)) {
-          // value = value + '/v2/api-docs'
-          this.platform = 'swagger'
-        } else {
-          this.platform = 'Apifox'
-        }
-
+        this.platform = getPlatform()
         this.$notify({
           type: "success",
           title: '提示',
@@ -81,20 +75,16 @@ const app = Vue.createApp({
           .post('/swagger', { url: value })
           .then(({ data }) => {
             this.loading = false
-            const { tags, basePath, definitions } = data
+            const { tags, basePath, definitions, paths } = data
             this.basePath = basePath || ''
             this.module = tags
-            this.apiData = data.paths
+            this.apiData = paths
+            this.definitions = definitions
 
-            // 收集生成表格的原生数据
-            var reg = /^[\u4e00-\u9fa5]\S*[\u4e00-\u9fa5]$/
-            for (const key in definitions) {
-              if (reg.test(key)) {
-                this.tableDataRow.push(definitions[key])
-              }
+            if (isNotTags(tags, this.apiData)) {
+              this.module = [{ name: '全部', description: '全部' }]
             }
 
-            this.definitions = definitions
           })
           .catch(() => {
             this.loading = false
@@ -106,6 +96,25 @@ const app = Vue.createApp({
             })
 
           })
+
+        /**
+         * @description: 判断是否有tags并且有数据
+         * @param {*} tags
+         * @param {*} apiData
+         * @return { Boolean }
+         **/
+        function isNotTags(tags, apiData) {
+          return !tags && Object.keys(apiData).length > 0
+        }
+
+        /**
+         * @description: 获取平台
+         * @param {*} value 
+         * @returns { String }
+         */
+        function getPlatform(value) {
+          return /openapi/.test(value) ? 'Apifox' : 'swagger'
+        }
       }
     },
 
@@ -115,74 +124,73 @@ const app = Vue.createApp({
      * @return {*}
      */
     selectModule() {
-      localStorage.setItem('form', JSON.stringify(this.formInline))
-
-      this.apiGenerate = ''
-      this.oldApiGenerate = ''
-      this.vueFuncGenerate = ''
-      this.tableGenerateData = ''
-      for (const key in this.apiData) {
-        const target = this.apiData[key]
-        let method = 'get'
-        let tag
-        if (target['get']) {
-          tag = target['get'].tags
-          method = 'get'
-        } else {
-          tag = target['post'].tags
-          method = 'post'
+      try {
+        localStorage.setItem('form', JSON.stringify(this.formInline))
+        const reset = () => {
+          this.apiGenerate = ''
+          this.oldApiGenerate = ''
+          this.vueFuncGenerate = ''
+          this.tableGenerateData = ''
         }
-        if (tag.includes(this.formInline.module)) {
-          let parameters
-          parameters = target[method].parameters
-          const tableRow = target[method]['responses'][200]['schema']?.$ref
-          console.log('tableRow===>', tableRow)
+        reset()
 
-          this.tableDataRow.find(item => {
-            const reg = new RegExp(`${item.title}`, 'g')
-            if (reg.test(tableRow)) {
-              this.tableGenerateData += this.generateTable(item)
+        for (const key in this.apiData) {
+          const target = this.apiData[key]
+          const { method, tag } = getTagsAndMethod(target)
+          if (isPass(this.formInline.module, tag)) {
+            const { parameters, summary } = target[method]
+            const annotation = this.generateAnnotation(parameters, summary)
+            if (this.formInline.new) {
+              this.apiGenerate += this.generateFuction(
+                target,
+                key,
+                method,
+                annotation
+              )
             }
-          })
 
-          summary = target[method].summary
-
-
-
-        
-
-          const annotation = this.generateAnnotation(parameters, summary)
-          if (this.formInline.new) {
-            this.apiGenerate += this.generateFuction(
-              target,
-              key,
-              method,
-              annotation
-            )
-          }
-
-          if (this.formInline.old) {
-            this.oldApiGenerate += this.generateOldFunction(
-              key,
-              method,
-              annotation,
-              interface,
-              interfaceName
-            )
-          }
-          const vueannotation = `
+            if (this.formInline.old) {
+              this.oldApiGenerate += this.generateOldFunction(
+                key,
+                method,
+                annotation,
+              )
+            }
+            const vueannotation = `
             /**
             * @description: ${summary}
             *  @return {*}
             */ `
-          if (this.formInline.vueFunc) {
-            this.vueFuncGenerate += this.generateVueFunc(
-              key,
-              method,
-              vueannotation
-            )
+            if (this.formInline.vueFunc) {
+              this.vueFuncGenerate += this.generateVueFunc(
+                key,
+                method,
+                vueannotation
+              )
+            }
           }
         }
+
+        /**
+         * @description: 获取tags和method
+         * @param {*} target
+         * @return {*}
+         */
+        function getTagsAndMethod(target) {
+          const method = target['get'] ? 'get' : 'post'
+          const tag = target[method].tags
+          return {
+            tag,
+            method
+          }
+        }
+
+        function isPass(module, tag) {
+          return module === '全部' || tag.includes(module)
+        }
+
+      } catch (error) {
+        console.log(error)
       }
     },
     /**
@@ -254,17 +262,15 @@ const app = Vue.createApp({
      * @param {*}
      * @return {*}
      */
-    generateOldFunction(key, method, summary, interface, interfaceName) {
-      const interfaceNameRes = interface ? ':' + interfaceName : ''
+    generateOldFunction(key, method, summary) {
       const paths = key.split('/')
       const methodPart = paths.at(-1)
       const url = `${this.formInline.oldHost}|${this.basePath}${key}|${method.toUpperCase()}`
       return `
-          ${interface}
           ${summary}
           export const ${method}${methodPart.replace(/^\S/, s =>
         s.toUpperCase()
-      )} = (data${interfaceNameRes} ) =>  request('${url}',data)`
+      )} = (data) =>  request('${url}',data)`
     },
 
     async getAppReservationPage() {
