@@ -31,3 +31,5 @@ export function getLoad - backend - developer(params, other = {}) {
   })
 }
 ```
+
+[使用文档](https://juejin.cn/spost/7293124262352224256)
