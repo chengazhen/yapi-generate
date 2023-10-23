@@ -1,12 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tools</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .tab:hover {
+            background-color: #555;
+        }
+
+        .logo {
+            max-width: 50px;
+            max-height: 50px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+    </style>
 </head>
+
 <body>
-  <a href="/public/swagger/" target="_blank">swagger</a>
-  <a href="/public/apifox/" target="_blank">apifox</a>
+    <div class="tab-container">
+        <a class="tab" href="/swagger/" target="_blank">
+            <img class="logo" src="./images/Swagger-logo.png" alt="Swagger Logo">
+            Swagger
+        </a>
+        <a class="tab" href="/swagger" target="_blank">
+            <img class="logo" src="./images/apifox-logo-256.png" alt="APIFox Logo">
+            <span>APIFox</span>
+        </a>
+        <a class="tab" href="/yapi" target="_blank">
+            <img class="logo" src="./images/yapi-logo.png" alt="YAPI Logo">
+            <span>YAPI</span>
+        </a>
+    </div>
+    <div class="content">
+        <h1>欢迎访问我们的API工具中心</h1>
+        <p>我们的网站提供了一个便捷的方式来访问和使用两个强大的API工具：APIFox和Swagger。无论您是开发人员、设计师还是项目经理，我们的平台简化了代码生成和API文档的过程。</p>
+        <p>APIFox和Swagger是两个行业标准工具，它们使您能够：</p>
+        <ul>
+            <li>为您的应用程序生成代码片段和SDK</li>
+        </ul>
+        <p>通过单击它们各自的标签，探索每个工具的功能，用我们用户友好的平台将您的API开发提升到一个新的水平。</p>
+    </div>
 </body>
+
 </html>

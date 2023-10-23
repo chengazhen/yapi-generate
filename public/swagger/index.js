@@ -64,6 +64,8 @@ const app = Vue.createApp({
         if (!/openapi/.test(value)) {
           // value = value + '/v2/api-docs'
           this.platform = 'swagger'
+        } else {
+          this.platform = 'Apifox'
         }
 
         this.$notify({

@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var API = require('../lib/apifox/index.js')
+var API = require('../lib/yapi/index.js')
 var path = require('path');
 const fs = require('fs');
-const dirPath = path.join(process.cwd(), 'public/file/apifox');
-const baseUrl = `/public/file/apifox`; // 替换为实际的基本URL
+const dirPath = path.join(process.cwd(), 'public/file/yapi');
+const baseUrl = `/file/yapi`; // 替换为实际的基本URL
 
 /* GET users listing. */
 router.post('/', async function (req, res, next) {

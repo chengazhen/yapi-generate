@@ -33,7 +33,7 @@ const app = createApp({
 
 
     function submitForm() {
-      axios.post('/apifox', formData.value).then(res => {
+      axios.post('/yapi', formData.value).then(res => {
         tableData.value = res.data.data
         ElementPlus.ElMessage({
           message: '生成成功',
