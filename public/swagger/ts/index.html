@@ -102,7 +102,7 @@
           <el-form-item label="baseHost">
             <el-input v-model="formInline.oldHost" placeholder="Please input" />
           </el-form-item>
-  
+
           <el-form-item>
             <el-link target="_blank" href="https://github.com/azhen98/generate-swagger-web" type="primary">
               github仓库
@@ -130,18 +130,18 @@
             <el-card>
               <div slot="header">
                 <el-tag>interface接口类型</el-tag>
-                <el-button :data-clipboard-text="Array.from(this.interfaceMap.values()).join('')" type="primary" plain size="small" style="float: right"
-                  class="copyBtn">复制所有代码
+                <el-button :data-clipboard-text="Array.from(this.interfaceMap.values()).join('')" type="primary" plain
+                  size="small" style="float: right" class="copyBtn">复制所有代码
                 </el-button>
               </div>
               <pre v-html="Array.from(this.interfaceMap.values()).join('')"></pre>
             </el-card>
           </el-col>
-         
+
         </el-row>
       </el-card>
       <el-card class="box-card" shadow="never">
-        
+
         <el-row :gutter="20">
           <el-col :span="12">
             <el-card>
@@ -154,9 +154,20 @@
               <pre v-html="vueFuncGenerate"></pre>
             </el-card>
           </el-col>
+          <el-col :span="12">
+            <el-card>
+              <div slot="header">
+                <el-tag>vue 内部函数</el-tag>
+                <el-button :data-clipboard-text="Array.from(this.interfaceResMap.values()).join('')" type="primary" plain size="small" style="float: right"
+                  class="copyBtn">复制所有代码
+                </el-button>
+              </div>
+              <div style="white-space: normal;" v-html="Array.from(this.interfaceResMap.values()).join('')"></div>
+            </el-card>
+          </el-col>
         </el-row>
       </el-card>
-     
+
     </div>
 
 

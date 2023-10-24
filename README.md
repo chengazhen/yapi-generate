@@ -33,3 +33,9 @@ export function getLoad - backend - developer(params, other = {}) {
 ```
 
 [使用文档](https://juejin.cn/spost/7293124262352224256)
+
+
+待完成列表
+
+1. 生成响应结果的ts类型
+

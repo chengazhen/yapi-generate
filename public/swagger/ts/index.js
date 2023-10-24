@@ -38,6 +38,7 @@ const app = Vue.createApp({
       definitions: {},
       platform: 'Apifox',
       interfaceMap: new Map(),
+      interfaceResMap: new Map(),
     }
   },
   mounted() {
@@ -77,12 +78,11 @@ const app = Vue.createApp({
      */
     urlInput(value) {
       if (/http/.test(value)) {
-        this.platform = getPlatform(value)
         this.$notify({
           type: "success",
           title: '提示',
           position: "bottom-right",
-          message: `当前api文档平台为 (${this.platform}) `
+          message: `当前api文档平台为 (${utils.getPlatform(value)}) `
         })
 
         this.loading = true
@@ -97,7 +97,7 @@ const app = Vue.createApp({
             this.apiData = data.paths
             this.definitions = definitions
 
-            if (isNotTags(tags, this.apiData)) {
+            if (utils.isNotTags(tags, this.apiData)) {
               this.module = [{ name: '全部', description: '全部' }]
             }
           })
@@ -111,25 +111,6 @@ const app = Vue.createApp({
             })
 
           })
-
-        /**
-      * @description: 判断是否有tags并且有数据
-      * @param {*} tags
-      * @param {*} apiData
-      * @return { Boolean }
-      **/
-        function isNotTags(tags, apiData) {
-          return !tags && Object.keys(apiData).length > 0
-        }
-
-        /**
-         * @description: 获取平台
-         * @param {*} value 
-         * @returns { String }
-         */
-        function getPlatform(value) {
-          return /openapi/.test(value) ? 'Apifox' : 'swagger'
-        }
       }
     },
 
@@ -150,14 +131,40 @@ const app = Vue.createApp({
         for (const [key, target] of Object.entries(this.apiData)) {
           const { tag, method } = utils.getTagsAndMethod(target)
           if (tag.includes(this.formInline.module)) {
-            const { parameters = [], summary, requestBody = null } = target[method]
+
+            const name = utils.generateInferfaceName(key, method)
+            const { parameters = [], summary, requestBody = null, responses = null } = target[method]
             if (requestBody) {
               if (/openapi/.test(this.formInline.url)) {
-                this.startApifox({ requestBody, key, method })
+                this.startApifox({ name, requestBody })
               } else {
                 this.startSwagger({ parameters, summary, requestBody, key, method })
               }
             }
+
+            // if (responses) {
+            //   function getInnerContentProperty(data) {
+            //     let content = null;
+            //     const traverse = (obj) => {
+            //       for (const key in obj) {
+            //         if (key === "result") {
+            //           content = obj[key];
+            //         } else if (typeof obj[key] === "object") {
+            //           traverse(obj[key]);
+            //         }
+            //       }
+            //     };
+            //     traverse(data);
+            //     return content;
+            //   }
+
+            //   const resSchema = getInnerContentProperty(responses);
+            //   if (resSchema && resSchema.type === 'object') {
+            //     const jsonString = utils.generateResInterface(resSchema, name)
+            //     const modifiedJsonString = jsonString.replace(/["\\]/g, '');
+            //     this.interfaceResMap.set(name, modifiedJsonString)
+            //   }
+            // }
             this.startCommon({ target, parameters, summary, key, method })
           }
         }
@@ -168,18 +175,6 @@ const app = Vue.createApp({
           message: '生成失败'
         })
       }
-
-
-      // // 导入接口类型
-      // const importStr = `import { ${Array.from(this.interfaceMap.keys()).join(',')} } from ''`
-      // if (this.formInline.old) {
-      //   this.oldApiGenerate = importStr + this.oldApiGenerate
-      // }
-
-
-      // if (this.formInline.new) {
-      //   this.apiGenerate = importStr + this.apiGenerate
-      // }
 
     },
 
@@ -200,16 +195,14 @@ const app = Vue.createApp({
       }
     },
 
-    startApifox({ requestBody, key, method }) {
-      const interfaceName = this.getInterfaceName(key, method)
+    startApifox({ name, requestBody }) {
       const schema = requestBody.content['application/json']?.schema
-      if (!this.interfaceMap.has(interfaceName) && schema) {
-        if (!schema.required) {
-          schema.required = []
-        }
-        interface = this.generateInterface(interfaceName, schema)
-        this.interfaceMap.set(interfaceName, interface)
+      if (this.interfaceMap.has(name)) {
+        return
       }
+      const _schema = utils.normalizeSchema(schema)
+      const interface = utils.generateApifoxInterface(name, _schema)
+      this.interfaceMap.set(name, interface)
     },
 
     /**
@@ -217,230 +210,14 @@ const app = Vue.createApp({
      * @param {*}
      * @return {*}
      * */
-    startCommon({ target, parameters, summary, key, method }) {
-      const annotation = this.generateAnnotation(parameters, summary)
-      if (this.formInline.new) {
-        this.apiGenerate += this.generateFuction(target, key, method, annotation)
-      }
-      if (this.formInline.old) {
-        const interfaceName = this.getInterfaceName(key, method)
-        this.oldApiGenerate += this.generateOldFunction(key, method, annotation, interface, interfaceName)
-      }
-      const vueannotation = `/**
-      * @description: ${summary}
-      * @return {*}
-      */`
-      if (this.formInline.vueFunc) {
-        this.vueFuncGenerate += this.generateVueFunc(key, method, vueannotation)
-      }
+    startCommon({ summary, key, method }) {
+      const annotation = utils.generateAnnotation(summary)
+      this.apiGenerate += utils.generateFunction(this.basePath, key, method, annotation)
+      this.vueFuncGenerate += utils.generateVueFunc(key, method, utils.getVueAnnotation(summary))
     },
 
-
-
-    /**
-     * @description: 生成函数注释
-     * @param {*} parameters
-     * @return {*}
-     */
-    generateAnnotation(parameters = [], summary) {
-      let paramStr = ``
-
-      //  判断是否生成了参数
-      if (paramStr) {
-        return `
-/**
-  * @description: ${summary}
-  ${paramStr}
-  * @return {*}
-  */ `
-      } else {
-        return `
-/**
-  * @description: ${summary}
-  * @return {*}
-  */ `
-      }
-
-    },
-
-    /**
-     * @description: 生成函数
-     * @param {*} target
-     * @param {*} key
-     * @param {*} method
-     * @param {*} annotation
-     * @return {*}
-     */
-    generateFuction(target, key, method, annotation) {
-      let paramsType = 'data'
-
-      if (method === 'get') {
-        paramsType = 'params'
-      }
-      const paths = key.split('/')
-      const isUrlParams = /{\S+}/.test(paths)
-      let url = `${this.basePath}${key}`
-      let methodPart = paths.at(-1)
-      const urlParams = paths.at(-1).replace(/\{|\}/g, '')
-      if (isUrlParams) {
-        methodPart = paths.at(-2)
-        key = key.replace(/\{\S+\}/g, '')
-        url = `"${this.basePath}${key}"` + '+' + urlParams
-      }
-      const funcStr = `
-            ${annotation}
-            export function ${method}${methodPart.replace(/^\S/, s =>
-        s.toUpperCase()
-      )}(${isUrlParams ? urlParams + ',' : ''} ${paramsType}, other = {}) {
-                return request({
-                url:'${url}',
-                method: '${method}',
-                ${paramsType},
-                ...other
-              })
-            }`
-      return funcStr
-    },
-
-
-    generateInterface(methodName, schema) {
-      let paramStr = `
-      interface ${methodName} {`
-      for (const [key, value] of Object.entries(schema.properties)) {
-        paramStr += `
-          ${key}${schema.required.includes(key) ? ':' : '?:'}${dict[value.type]}`
-      }
-
-      paramStr += `
-    }`
-
-      return paramStr
-
-    },
-
-    // 生成swagger接口
-    generateSwaggerInterface({ title, properties }) {
-      return `\ninterface ${title} {\n${Object.entries(properties).map(([key, value]) => {
-        return `${key}${value.required ? ':' : '?:'}${dict[value.type]}\n`
-      }).join('')}}`
-    },
-
-    /**
-     * @description: 生成旧版 api
-     * @param {*}
-     * @return {*}
-     */
-    generateOldFunction(key, method, summary, interface, interfaceName) {
-      const paths = key.split('/')
-      const methodPart = paths.at(-1)
-      const url = `${this.formInline.oldHost}|${this.basePath}${key}|${method.toUpperCase()}`
-      return `\n${summary}
-          export const ${method}${methodPart.replace(/^\S/, s =>
-        s.toUpperCase()
-      )} = (data: ${interfaceName} ):Promise&lt;any&gt; =>  request('${url}',data)`
-    },
-
-    async getAppReservationPage() {
-      try {
-        this.tableLoading = true
-        const { code, data } = await getAppReservationPage(this.listQuery)
-        if (code === 0) {
-          this.total = data.total
-          this.tabelData = data.records
-        }
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.tableLoading = false
-      }
-    },
-
-    /**
-     * @description: 生成 vue 内部调用函数
-     * @param {*} key
-     * @param {*} method
-     * @param {*} annotation
-     * @return {*}
-     */
-    generateVueFunc(key, method, annotation) {
-      const paths = key.split('/')
-      const methodPart = paths.at(-1)
-      const funcName = ` ${method}${methodPart.replace(/^\S/, s =>
-        s.toUpperCase()
-      )}`
-      const funcStr = `
-        ${annotation}
-        async ${funcName}() {
-            try {
-                const { code, result } = await ${funcName}()
-                if (code === 200 && result) {
-
-                }else{
-                    this.tableData = []
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        },`
-      return funcStr
-    },
-
-    generateTable(row) {
-      const properties = row.properties
-      let keyArr = `
-                [`
-      let titleArr = `
-                [`
-      // const propertiesLength = Object.keys(row.properties).length-1
-      // let index = 0
-      function generateAccuracyStr(key, title) {
-        if (/[准确率|正确率]/g.test(title)) {
-          return `
-            <template slot-scope="{row}">
-              <div>
-                {{((row['${key}']||0)*100).toFixed(2)}}%
-              </div>
-            </template>
-            `
-        }
-        return ``
-      }
-      let str = `
-            // ${row.title}
-            <el-table :data="tableData"
-            style="width: 100%"
-            height="100%"
-            v-loading="tableLoading"
-            :header-row-style="aheaderRowStyle"
-            :row-class-name="tableRowClassName">`
-      for (const [key, value] of Object.entries(properties)) {
-        keyArr += `"${key}",
-                `
-        titleArr += `"${value.description}",
-                `
-        str += `
-                <el-table-column prop="${key}"
-                     label="${value.description}"
-                     sortable=''
-                     min-width='160px'
-                     align='center'>
-                ${generateAccuracyStr(key, value.description)}
-                </el-table-column> `
-      }
-      str += `
-            </el-table>
-            ${keyArr}]
-            ${titleArr}]
-            `
-      return str
-    },
-
-    getInterfaceName(key, method) {
-      const paths = key.split('/')
-      const methodPart = paths.at(-1)
-      return `${method.replace(/^\S/, s => s.toUpperCase())}${methodPart.replace(/^\S/, s => s.toUpperCase())}`
-    }
   }
 })
 app.use(ElementPlus)
 app.mount('#app')
+
