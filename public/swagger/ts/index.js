@@ -142,29 +142,30 @@ const app = Vue.createApp({
               }
             }
 
-            // if (responses) {
-            //   function getInnerContentProperty(data) {
-            //     let content = null;
-            //     const traverse = (obj) => {
-            //       for (const key in obj) {
-            //         if (key === "result") {
-            //           content = obj[key];
-            //         } else if (typeof obj[key] === "object") {
-            //           traverse(obj[key]);
-            //         }
-            //       }
-            //     };
-            //     traverse(data);
-            //     return content;
-            //   }
+            if (responses) {
+              console.log('responses', responses)
+              // function getInnerContentProperty(data) {
+              //   let content = null;
+              //   const traverse = (obj) => {
+              //     for (const key in obj) {
+              //       if (key === "result") {
+              //         content = obj[key];
+              //       } else if (typeof obj[key] === "object") {
+              //         traverse(obj[key]);
+              //       }
+              //     }
+              //   };
+              //   traverse(data);
+              //   return content;
+              // }
 
-            //   const resSchema = getInnerContentProperty(responses);
-            //   if (resSchema && resSchema.type === 'object') {
-            //     const jsonString = utils.generateResInterface(resSchema, name)
-            //     const modifiedJsonString = jsonString.replace(/["\\]/g, '');
-            //     this.interfaceResMap.set(name, modifiedJsonString)
-            //   }
-            // }
+              // const resSchema = getInnerContentProperty(responses);
+              // if (resSchema && resSchema.type === 'object') {
+              //   const jsonString = utils.generateResInterface(resSchema, name)
+              //   const modifiedJsonString = jsonString.replace(/["\\]/g, '');
+              //   this.interfaceResMap.set(name, modifiedJsonString)
+              // }
+            }
             this.startCommon({ target, parameters, summary, key, method })
           }
         }

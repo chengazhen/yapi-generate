@@ -8,6 +8,7 @@
     "dev:win": "nodemon ./bin/www"
   },
   "dependencies": {
+    "@umijs/openapi": "^1.9.1",
     "axios": "^1.5.1",
     "cookie-parser": "~1.4.4",
     "dayjs": "^1.11.10",
@@ -17,6 +18,7 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "nodemon": "^3.0.1",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "swagger2openapi": "^7.0.8"
   }
 }

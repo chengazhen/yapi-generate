@@ -7,6 +7,7 @@ var logger = require('morgan');
 var usersRouter = require('./routes/users');
 var swaggerUi = require('./routes/swagger')
 var yapi = require('./routes/yapi')
+var openai = require('./routes/openai')
 var app = express();
 
 
@@ -19,6 +20,7 @@ app.use('/',express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 app.use('/swagger', swaggerUi);
 app.use('/yapi', yapi);
+app.use('/openai', openai)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

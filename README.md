@@ -39,3 +39,8 @@ export function getLoad - backend - developer(params, other = {}) {
 
 1. 生成响应结果的ts类型
 
+
+生成ts可以参考的文档
+[zeronejs](https://github.com/zeronejs/zerone/blob/45629960d94da6c1e59cb8b07388841901abadf8/packages/cli/src/actions/generate.api.action.ts#L99)
+
+@umijs/openapi

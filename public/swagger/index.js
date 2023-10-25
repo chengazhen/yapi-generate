@@ -78,18 +78,18 @@ const app = Vue.createApp({
           .post('/swagger', { url: value })
           .then(({ data }) => {
             this.loading = false
-            const { tags, basePath, definitions, paths } = data
+            const { tags, basePath,  paths } = data
             this.basePath = basePath || ''
             this.module = tags
             this.apiData = paths
-            this.definitions = definitions
 
             if (isNotTags(tags, this.apiData)) {
               this.module = [{ name: '全部', description: '全部' }]
             }
 
           })
-          .catch(() => {
+          .catch((error) => {
+            console.log(error);
             this.loading = false
             this.$notify({
               type: "error",
