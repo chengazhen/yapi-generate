@@ -9,7 +9,8 @@ const app = Vue.createApp({
         old: false,
         new: true,
         vueFunc: true,
-        oldHost: 'api'
+        oldHost: 'api',
+        instanceName: 'request'
       },
       module: [],
       apiData: {},
@@ -142,11 +143,12 @@ const app = Vue.createApp({
             const { parameters, summary } = target[method]
             const annotation = this.generateAnnotation(parameters, summary)
             if (this.formInline.new) {
-              this.apiGenerate += this.generateFuction(
-                target,
+              this.apiGenerate += utils.generateFunction(
+                this.basePath,
                 key,
                 method,
-                annotation
+                annotation,
+                this.formInline.instanceName,
               )
             }
 

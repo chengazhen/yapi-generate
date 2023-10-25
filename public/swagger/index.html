@@ -69,36 +69,55 @@
       </div>
 
       <el-card class="form-card" shadow="never">
-        <el-form :inline="true" :model="formInline" class="demo-form-inline">
-          <el-form-item label="文档接口">
-            <el-input v-model="formInline.url" placeholder="文档接口,不需要swagger.html路径" @change="urlInput">
-            </el-input>
-          </el-form-item>
-          <el-form-item label="接口模块">
-            <el-select v-model="formInline.module" placeholder="接口模块" @change="selectModule">
-              <el-option :label="item.ame" :value="item.name" v-for="(item,index) in module" :key="index">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="是否生成公司内部api:">
-            <el-switch v-model="formInline.old"> </el-switch>
-          </el-form-item>
-          <el-form-item label="是否生成vue内部函数:">
-            <el-switch v-model="formInline.vueFunc"> </el-switch>
-          </el-form-item>
-          <el-form-item label="是否生成新版api:">
-            <el-switch v-model="formInline.new"> </el-switch>
-          </el-form-item>
+        <el-form :inline="true" :model="formInline" class="demo-form-inline" label-width="180">
+          <el-row>
+            <el-col :xs="24" :sm="12" :md="8" :xl="4">
+              <el-form-item label="文档接口">
+                <el-input v-model="formInline.url" placeholder="文档接口,不需要swagger.html路径" @change="urlInput"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="8" :xl="4">
+              <el-form-item label="接口模块">
+                <el-select v-model="formInline.module" placeholder="接口模块" @change="selectModule">
+                  <el-option :label="item.ame" :value="item.name" v-for="(item,index) in module"
+                    :key="index"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="8" :xl="4">
+              <el-form-item label="自定义实例名称:">
+                <el-input v-model="formInline.instanceName" placeholder="Please input" style="width: 100%;"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="8" :xl="4">
+              <el-form-item label="是否生成vue内部函数:">
+                <el-switch v-model="formInline.vueFunc"></el-switch>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="8" :xl="4">
+              <el-form-item label="是否生成新版api:">
+                <el-switch v-model="formInline.new"></el-switch>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="8" :xl="4">
+              <el-form-item label="是否生成公司内部api:">
+                <el-switch v-model="formInline.old"></el-switch>
+              </el-form-item>
+            </el-col>
 
-          <el-form-item label="baseHost(内部用)">
-            <el-input v-model="formInline.oldHost" placeholder="Please input" />
-          </el-form-item>
+          </el-row>
 
-          <el-form-item>
-            <el-link target="_blank" href="https://github.com/Journey98/yapi-generate" type="primary">
-              github仓库
-            </el-link>
-          </el-form-item>
+          <div style="margin-top: 16px;">
+            <el-form-item label="baseHost(内部用)">
+              <el-input v-model="formInline.oldHost" placeholder="Please input" style="width: 100%;"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-link target="_blank" href="https://github.com/Journey98/yapi-generate" type="primary">
+                github仓库
+              </el-link>
+            </el-form-item>
+          </div>
+
         </el-form>
 
       </el-card>
@@ -156,6 +175,7 @@
 <script src="../javascripts/index.full.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+ <script src="./lib/index.js"></script>
 <script src="./index.js">
 </script>
 

@@ -124,20 +124,19 @@ var utils = {
      * @param {string} annotation
      * @return {string}
      */
-  generateFunction(basePath, key, method, annotation) {
+  generateFunction(basePath, key, method, annotation, instanceName = 'request') {
     const paramsType = method === 'get' ? 'params' : 'data';
     const paths = key.split('/');
     const isUrlParams = /{\S+}/.test(key);
     const urlParams = isUrlParams ? paths.at(-2).replace(/\{|\}/g, '') : '';
     const url = isUrlParams ? `${basePath}${key.replace(/\{\S+\}/g, '')} + ${urlParams}` : `"${basePath}${key}"`;
-
     const methodPart = isUrlParams ? paths.at(-2) : paths.at(-1);
-    const functionName = `${method}${methodPart.replace(/^\S/, s => s.toUpperCase())}`;
+    const functionName = `${method}${this.camelize(methodPart)}`;
 
     const funcStr = `
     ${annotation}
     export function ${functionName}(${isUrlParams ? urlParams + ',' : ''} ${paramsType}, other = {}) {
-        return request({
+        return ${instanceName}({
             url: ${url},
             method: '${method}',
             ${paramsType},
@@ -234,6 +233,15 @@ var utils = {
         return 'any';
     }
   },
+
+  /**
+   * @description: 将字符串转换成驼峰
+   * @param {string} str
+   * @return {string}
+   */
+  camelize(str) {
+    return str.replace(/^\S/, s => s.toUpperCase()).replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''))
+  }
 
 
 
