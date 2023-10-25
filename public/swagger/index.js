@@ -15,8 +15,10 @@ const app = Vue.createApp({
       module: [],
       apiData: {},
       apiGenerate: '',
+      apiGenerateHtml: '',
       oldApiGenerate: '',
       vueFuncGenerate: '',
+      vueFuncGenerateHtml: '',
       loading: false,
       activeNames: '1',
       tableDataRow: [],
@@ -165,14 +167,20 @@ const app = Vue.createApp({
             *  @return {*}
             */ `
             if (this.formInline.vueFunc) {
-              this.vueFuncGenerate += this.generateVueFunc(
+              this.vueFuncGenerate += utils.generateVueFunc(
                 key,
                 method,
                 vueannotation
               )
             }
           }
+
+
         }
+
+        this.apiGenerateHtml = utils.codeToHtml(Window.highlighter, this.apiGenerate)
+        this.vueFuncGenerateHtml = utils.codeToHtml(Window.highlighter, this.vueFuncGenerate)
+
 
         /**
          * @description: 获取tags和method
@@ -291,35 +299,6 @@ const app = Vue.createApp({
       }
     },
 
-    /**
-     * @description: 生成 vue 内部调用函数
-     * @param {*} key
-     * @param {*} method
-     * @param {*} annotation
-     * @return {*}
-     */
-    generateVueFunc(key, method, annotation) {
-      const paths = key.split('/')
-      const methodPart = paths.at(-1)
-      const funcName = ` ${method}${methodPart.replace(/^\S/, s =>
-        s.toUpperCase()
-      )}`
-      const funcStr = `
-        ${annotation}
-        async ${funcName}() {
-            try {
-                const { code, result } = await ${funcName}()
-                if (code === 200 && result) {
-
-                }else{
-                    this.tableData = []
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        },`
-      return funcStr
-    },
 
     generateTable(row) {
       const properties = row.properties

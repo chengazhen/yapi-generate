@@ -131,7 +131,7 @@
                   class="copyBtn">复制所有代码
                 </el-button>
               </div>
-              <pre v-html="apiGenerate"></pre>
+              <pre v-html="apiGenerateHtml" style="margin-top: 16px;"></pre>
             </el-card>
           </el-col>
           <el-col :span="12">
@@ -142,7 +142,7 @@
                   class="copyBtn">复制所有代码
                 </el-button>
               </div>
-              <pre v-html="vueFuncGenerate"></pre>
+              <pre v-html="vueFuncGenerateHtml" style="margin-top: 16px;"></pre>
             </el-card>
           </el-col>
         </el-row>
@@ -175,8 +175,10 @@
 <script src="../javascripts/index.full.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
- <script src="./lib/index.js"></script>
-<script src="./index.js">
-</script>
+<script src="../javascripts/shiki.js"></script>
+<script src="./lib/shiki.js"></script>
+<script src="./lib/index.js"></script>
+<script src="./index.js"></script>
+
 
 </html>

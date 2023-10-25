@@ -164,7 +164,7 @@ var utils = {
 
     const funcStr = `
     ${annotation}
-    async ${funcName}() {
+    async function ${funcName}() {
         try {
             const { code, result } = await ${funcName}();
             if (code === 200 && result) {
@@ -176,7 +176,7 @@ var utils = {
         } catch (error) {
             console.error(error);
         }
-    },
+    }
   `;
     return funcStr;
   },
@@ -241,6 +241,10 @@ var utils = {
    */
   camelize(str) {
     return str.replace(/^\S/, s => s.toUpperCase()).replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''))
+  },
+
+  codeToHtml(highlighter, str) {
+    return highlighter.codeToHtml(str, { lang: 'js' })
   }
 
 
