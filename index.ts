@@ -1,1 +1,23 @@
-export interface PostIndex { "dayList": "{\"activeTeacherNum\":\"number\",\"schoolAvgAnswerTime\":\"number\",\"schoolHteAvgCorrectRate\":\"number\",\"teaUseExercisePoolNum\":\"number\",\"timeRanger\":\"string\",\"usePaperNum\":\"number\"}[]", "weekList": { "activeTeacherNum_7d": "number", "assignHteNum_7d": "number", "classNums": "number", "schoolAvgAnswerTime_7d": "number", "schoolHteAvgCorrectRate_7d": "number", "submitHteClassNum_7d": "number", "submitHteStuNum_7d": "number", "teacherLectureNum_7d": "number", "teacherNumber_7d": "number" } }export interface PostSchoolActive { "activeRate": "number", "activeTeacherNum": "number", "hteTotal": "number", "teacherLectureNum": "number", "teacherNumber": "number", "timesTotal": "number", "uploadCoursewareNum": "number" }export interface PostTeacherActive { "list": "{\"assignHteNum\":\"number\",\"explainHteNum\":\"number\",\"teacherActiveDays\":\"number\",\"teacherId\":\"number\",\"teacherLectureNum\":\"number\",\"teacherName\":\"string\",\"uploadCoursewareNum\":\"number\"}[]", "nums": "number" }export interface PostTeacherNoActive { "list": "{\"assignHteNum\":\"number\",\"explainHteNum\":\"number\",\"teacherActiveDays\":\"number\",\"teacherId\":\"number\",\"teacherLectureNum\":\"number\",\"teacherName\":\"string\",\"uploadCoursewareNum\":\"number\"}[]", "nums": "number" }export interface PostTeacherActiveDetails { "list": "{\"assignHteNum\":\"number\",\"explainHteNum\":\"number\",\"teacherActiveDays\":\"number\",\"teacherId\":\"number\",\"teacherLectureNum\":\"number\",\"teacherName\":\"string\",\"uploadCoursewareNum\":\"number\"}[]", "nums": "number" }export interface PostJobStatisticsDetail { "list": "{\"classId\":\"number\",\"className\":\"string\",\"gradeAvgAnswerTime\":\"number\",\"gradeAvgCorrectRate\":\"number\",\"gradeName\":\"string\",\"gradeNumber\":\"number\",\"stuNumber\":\"number\",\"subjectId\":\"number\",\"subjectName\":\"string\",\"submitHteCopiesNum\":\"number\",\"submitHteNum\":\"number\",\"submitHteStuNum\":\"number\",\"submitTimeHteCopiesNum\":\"number\"}[]", "nums": "number" }export interface PostTeachingAnalysis { "alreadyUse": "number", "list": "{\"exercisePoolId\":\"number\",\"exercisePoolName\":\"string\",\"lastSubmitHteDate\":\"string\",\"submitExercisePoolStuNum\":\"number\",\"exercisePoolCover\":\"number\"}[]", "total": "number" }export interface PostTeachingAnalysisClass { "list": "{\"classExercisePoolAvgCorrectRate\":\"number\",\"classId\":\"number\",\"className\":\"string\",\"gradeName\":\"string\",\"gradeNumber\":\"number\",\"stuExercisePoolAvgAnswerSubExErNum\":\"number\",\"submitExercisePoolStuNum\":\"number\",\"timeRanger\":\"string\"}[]", "totalModel": { "exercisePoolNum": "number", "schoolExercisePoolAvgCorrectRate": "number", "stuExercisePoolAvgAnswerSubExErNum": "number", "submitExercisePoolStuNum": "number", "submitExercisePoolSubExErNum": "number", "useExercisePoolClassNum": "number" } }
+
+export type PostTransform = string[]
+
+export type GetTest = {
+  name: string;
+  age: string;
+}
+
+export type GetTest2 = {
+  friends: {
+    name: string;
+  };
+  names: string[];
+  name2: {
+    name: string;
+    age: string;
+  }[];
+}
+export type GetString = string
+
+export type GetObjarr = {
+  name: string;
+}[]

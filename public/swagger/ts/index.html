@@ -48,6 +48,11 @@
     .box-card {
       margin-top: 20px;
     }
+
+    pre {
+      word-break:break-all;
+      word-wrap:break-word;
+    }
   </style>
   <meta charset="UTF-8" />
   <!-- import CSS -->
@@ -115,7 +120,7 @@
       </el-card>
       <el-card class="box-card" shadow="never">
         <el-row :gutter="20">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-card>
               <div slot="header">
                 <el-tag>api 接口</el-tag>
@@ -126,7 +131,7 @@
               <pre v-html="apiGenerate"></pre>
             </el-card>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-card>
               <div slot="header">
                 <el-tag>interface接口类型</el-tag>
@@ -134,7 +139,18 @@
                   size="small" style="float: right" class="copyBtn">复制所有代码
                 </el-button>
               </div>
-              <pre v-html="Array.from(this.interfaceMap.values()).join('')"></pre>
+              <pre v-html="Array.from(this.interfaceMap.values()).join('\n')"></pre>
+            </el-card>
+          </el-col>
+          <el-col :span="8">
+            <el-card>
+              <div slot="header">
+                <el-tag>interfaceResMap</el-tag>
+                <el-button :data-clipboard-text="Array.from(this.interfaceResMap.values()).join('\n')" type="primary" plain size="small" style="float: right"
+                  class="copyBtn">复制所有代码
+                </el-button>
+              </div>
+              <pre v-html="Array.from(this.interfaceResMap.values()).join('\n')"></pre>
             </el-card>
           </el-col>
 
@@ -154,17 +170,7 @@
               <pre v-html="vueFuncGenerate"></pre>
             </el-card>
           </el-col>
-          <el-col :span="12">
-            <el-card>
-              <div slot="header">
-                <el-tag>vue 内部函数</el-tag>
-                <el-button :data-clipboard-text="Array.from(this.interfaceResMap.values()).join('')" type="primary" plain size="small" style="float: right"
-                  class="copyBtn">复制所有代码
-                </el-button>
-              </div>
-              <div style="white-space: normal;" v-html="Array.from(this.interfaceResMap.values()).join('')"></div>
-            </el-card>
-          </el-col>
+         
         </el-row>
       </el-card>
 
@@ -173,10 +179,13 @@
 
   </div>
 </body>
-<script src="https://unpkg.com/vue@3"></script>
+<script src="../../javascripts/vue.global.js"></script>
+
+<!-- <script src="https://unpkg.com/vue@3"></script> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.min.js"></script> -->
 <!-- <script src="https://unpkg.com/ElementPlus-ui/lib/index.js"></script> -->
-<script src="https://cdn.jsdelivr.net/npm/element-plus@2.2.0/dist/index.full.min.js"></script>
+<script src="../../javascripts/index.full.min.js"></script>
+
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
 <script src="./swagger.js"></script>

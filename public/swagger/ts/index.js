@@ -134,38 +134,20 @@ const app = Vue.createApp({
 
             const name = utils.generateInferfaceName(key, method)
             const { parameters = [], summary, requestBody = null, responses = null } = target[method]
+
             if (requestBody) {
               if (/openapi/.test(this.formInline.url)) {
-                this.startApifox({ name, requestBody })
+                this.startApifox({ name, requestBody, responses })
               } else {
                 this.startSwagger({ parameters, summary, requestBody, key, method })
               }
             }
 
             if (responses) {
-              console.log('responses', responses)
-              // function getInnerContentProperty(data) {
-              //   let content = null;
-              //   const traverse = (obj) => {
-              //     for (const key in obj) {
-              //       if (key === "result") {
-              //         content = obj[key];
-              //       } else if (typeof obj[key] === "object") {
-              //         traverse(obj[key]);
-              //       }
-              //     }
-              //   };
-              //   traverse(data);
-              //   return content;
-              // }
-
-              // const resSchema = getInnerContentProperty(responses);
-              // if (resSchema && resSchema.type === 'object') {
-              //   const jsonString = utils.generateResInterface(resSchema, name)
-              //   const modifiedJsonString = jsonString.replace(/["\\]/g, '');
-              //   this.interfaceResMap.set(name, modifiedJsonString)
-              // }
+              this.startApifoxRes(name, responses)
             }
+
+
             this.startCommon({ target, parameters, summary, key, method })
           }
         }
@@ -196,7 +178,31 @@ const app = Vue.createApp({
       }
     },
 
-    startApifox({ name, requestBody }) {
+    startApifoxRes(name, responses) {
+      const resSchema = getInnerContentProperty(responses);
+
+      if (resSchema) {
+        // 返回基本类型，直接取值
+        if (['string', 'number', 'boolean'].includes(resSchema.type)) {
+          return this.interfaceResMap.set(name, `export type ${name} = ${resSchema.type}`)
+        }
+
+        const jsonString = utils.generateResInterface(resSchema, name)
+        if (resSchema.type === 'object') {
+          this.interfaceResMap.set(name, jsonString)
+        }
+
+        if (resSchema.type === 'array') {
+          this.interfaceResMap.set(name, `${jsonString}`)
+        }
+      }
+
+      function getInnerContentProperty(data, key = 'result') {
+        return data[200].content["application/json"].schema.properties[key]
+      }
+    },
+
+    startApifox({ name, requestBody, responses }) {
       const schema = requestBody.content['application/json']?.schema
       if (this.interfaceMap.has(name)) {
         return
@@ -204,6 +210,9 @@ const app = Vue.createApp({
       const _schema = utils.normalizeSchema(schema)
       const interface = utils.generateApifoxInterface(name, _schema)
       this.interfaceMap.set(name, interface)
+
+
+
     },
 
     /**

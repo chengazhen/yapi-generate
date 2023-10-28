@@ -192,38 +192,134 @@ var utils = {
 
   // apifox
   generateResInterface(schema, name) {
-    const data = this.generateInterfaceFromSchema(schema)
-    return `export interface ${name} ${JSON.stringify(data)}`
+    const data = this.ATransformSchemaProp(schema)
+    console.log(data);
+    return this.AGenStr(data, name)
   },
 
-  generateInterfaceFromSchema(schema) {
-    const { properties } = this.getFiledObj(schema)
+  AGenStr(data, name) {
+    const getType = (value) => {
+
+      console.log(value, 'value===>');
+
+      if (this.isNonReferenceType(value)) {
+        return value
+      } else if (Array.isArray(value)) {
+        if (value.length > 0 && typeof value[0] === 'object') {
+          const properties = value[0];
+          const subType = getObjectType(properties)
+          return `{ ${subType} }[]`;
+        } else if (value.length > 0 && typeof value[0] !== 'object') {
+          return `${value[0]}[]`
+        } else {
+          return `${getType(value[0])}[]`;
+        }
+      } else if (typeof value === 'object') {
+        const properties = value;
+        const subType = getObjectType(properties)
+        return `{ ${subType} }`;
+      } else {
+        return 'unknown';
+      }
+    }
+
+    function getObjectType(properties) {
+      return Object.keys(properties)
+        .map((key) => `\n${key}: ${getType(properties[key])};`)
+        .join(' ');
+    }
+
+    const typeDefinition = [];
+
+    if (Array.isArray(data)) {
+      if (typeof data[0] !== 'object') {
+        return `\nexport type ${name} = ${data[0]}[]`
+      } else if (typeof data[0] === 'object') {
+        return `\nexport type ${name} = ${getType(data[0])}[]`
+      }
+    }
+
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        const type = getType(data[key]);
+        typeDefinition.push(`\n${key}: ${type};`);
+      }
+    }
+
+
+    return `\nexport type ${name} = { ${typeDefinition.join(' ')}}`;
+  },
+
+  /**
+   * @description apifox 转换属性类型
+   * @returns 
+   */
+  ATransformSchemaProp(schema) {
+    let { properties, type } = this.getFiledObj(schema)
+    
+
     const copyProperties = {}
+    // 处理根数据为数组
+    if (type === 'array') {
+      // 处理元素为基本类的数组
+      if (!properties.properties) {
+        return [properties.type]
+      } else {
+        return [this.ATransformSchemaProp(properties)]
+      }
+    }
+
     for (const [k, v] of Object.entries(properties)) {
       if (v.type === 'object') {
-        copyProperties[k] = this.generateInterfaceFromSchema(v)
+        copyProperties[k] = this.ATransformSchemaProp(v)
       } else if (v.type === 'array') {
-        copyProperties[k] = `${JSON.stringify(this.generateInterfaceFromSchema(v))}[]`
+        if (v.items.properties) {
+          copyProperties[k] = [this.ATransformSchemaProp(v.items)]
+        } else {
+          copyProperties[k] = this.ATransformSchemaProp(v)
+        }
       } else {
         copyProperties[k] = this.getTSType(v.type)
       }
     }
-    return {
-      ...copyProperties
-    }
+    return copyProperties
   },
+
+  // generateInterfaceFromSchema(schema) {
+  //   const { properties } = this.getFiledObj(schema)
+  //   const copyProperties = {}
+  //   for (const [k, v] of Object.entries(properties)) {
+  //     if (v.type === 'object') {
+  //       copyProperties[k] = this.generateInterfaceFromSchema(v)
+  //     } else if (v.type === 'array') {
+  //       if (v.items.properties) {
+  //         copyProperties[k] = [this.generateInterfaceFromSchema(v.items)]
+  //       } else {
+  //         copyProperties[k] = [this.generateInterfaceFromSchema(v)]
+  //       }
+  //     } else if (k === 'type') {
+  //       return v
+  //     } else {
+  //       copyProperties[k] = this.getTSType(v.type)
+  //     }
+  //   }
+
+  //   return copyProperties
+  // },
 
 
 
   getFiledObj(schema) {
     const { type } = schema
+
     return {
       type,
-      properties: type === 'array' ? schema.items.properties : schema.properties
+      properties: type === 'array' ? schema.items : schema.properties
     }
   },
 
   getTSType(type) {
+    console.log(type);
     switch (type) {
       case 'integer':
         return 'number';
@@ -245,8 +341,11 @@ var utils = {
 
   codeToHtml(highlighter, str) {
     return highlighter.codeToHtml(str, { lang: 'js' })
-  }
+  },
 
+  isNonReferenceType(data) {
+    return typeof data !== 'object' || data === null;
+  }
 
 
 }
